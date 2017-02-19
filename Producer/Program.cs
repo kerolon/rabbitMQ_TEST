@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Producer
 {
-    class Send
+    class NewTask
     {
         static void Main(string[] args)
         {
@@ -15,18 +15,20 @@ namespace Producer
             using (var con = factory.CreateConnection())
             using (var channel = con.CreateModel())
             {
-                channel.QueueDeclare(queue: "hello",
+                channel.QueueDeclare(queue: "task_queue",
                     durable: false,
                     exclusive: false,
                     autoDelete: false,
                     arguments:null);
 
-                string message = "Hello World!";
+                string message = GetMessage(args);
                 var body = Encoding.UTF8.GetBytes(message);
+                var properties = channel.CreateBasicProperties();
+                properties.Persistent = true;
 
                 channel.BasicPublish(exchange: "",
-                    routingKey: "hello",
-                    basicProperties: null,
+                    routingKey: "task_queue",
+                    basicProperties: properties,
                     body: body);
 
                 Console.WriteLine($"[x] Send {message}");
@@ -34,6 +36,11 @@ namespace Producer
 
             Console.WriteLine("Press [enter] to exit.");
             Console.ReadLine();
+        }
+
+        private static string GetMessage(string[] args)
+        {
+            return ((args.Length > 0) ? string.Join(" ", args) : "Hello World!");
         }
     }
 }
