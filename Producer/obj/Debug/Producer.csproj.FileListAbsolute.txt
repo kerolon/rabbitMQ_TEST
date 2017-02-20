@@ -1,5 +1,4 @@
 C:\src\rabbitMQ_TEST\Producer\bin\Debug\Producer.exe.config
-C:\src\rabbitMQ_TEST\Producer\obj\Debug\Producer.csprojResolveAssemblyReference.cache
 C:\src\rabbitMQ_TEST\Producer\bin\Debug\Producer.exe
 C:\src\rabbitMQ_TEST\Producer\bin\Debug\Producer.pdb
 C:\src\rabbitMQ_TEST\Producer\bin\Debug\RabbitMQ.Client.dll

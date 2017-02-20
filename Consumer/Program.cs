@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Consumer
 {
-    class Receive
+    class ReceiveLogs
     {
         static void Main(string[] args)
         {
@@ -17,30 +17,25 @@ namespace Consumer
             using (var con = factory.CreateConnection())
             using (var channel = con.CreateModel())
             {
-                channel.QueueDeclare(queue: "task_queue",
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                arguments:null);
-
-                channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-
+                channel.ExchangeDeclare(exchange:"logs",type:"fanout");
+                var queueName = channel.QueueDeclare().QueueName;
+                channel.QueueBind(queue: queueName, exchange: "logs", routingKey: "");
+                
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (model, ea) =>
                 {
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body);
-                    Console.WriteLine($"[x] Received {message}");
+                    Console.WriteLine($"[x] {message}");
 
                     int dots = message.Split('.').Length - 1;
                     Thread.Sleep(dots * 1000);
-
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                    
                 };
 
                 channel.BasicConsume(
-                    queue: "task_queue",
-                    noAck: false,
+                    queue: queueName,
+                    noAck: true,
                     consumer: consumer);
 
                 Console.WriteLine("Press [enter] to exit");

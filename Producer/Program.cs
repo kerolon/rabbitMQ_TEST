@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Producer
 {
-    class NewTask
+    class EmitLog
     {
         static void Main(string[] args)
         {
@@ -15,20 +15,14 @@ namespace Producer
             using (var con = factory.CreateConnection())
             using (var channel = con.CreateModel())
             {
-                channel.QueueDeclare(queue: "task_queue",
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments:null);
-
+                channel.ExchangeDeclare("logs", "fanout");
+                
                 string message = GetMessage(args);
                 var body = Encoding.UTF8.GetBytes(message);
-                var properties = channel.CreateBasicProperties();
-                properties.Persistent = true;
-
-                channel.BasicPublish(exchange: "",
-                    routingKey: "task_queue",
-                    basicProperties: properties,
+                
+                channel.BasicPublish(exchange: "logs",
+                    routingKey: "",
+                    basicProperties: null,
                     body: body);
 
                 Console.WriteLine($"[x] Send {message}");
