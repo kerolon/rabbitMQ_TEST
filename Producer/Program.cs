@@ -15,17 +15,20 @@ namespace Producer
             using (var con = factory.CreateConnection())
             using (var channel = con.CreateModel())
             {
-                channel.ExchangeDeclare("logs", "fanout");
+                channel.ExchangeDeclare("topic_logs", "topic");
                 
-                string message = GetMessage(args);
+                var severity = (args.Length > 0)? args[0]:"anonymous.info";
+                string message = (args.Length > 1)
+                    ? string.Join(" ", args.Skip(1).ToArray())
+                    : "Hello World!";
                 var body = Encoding.UTF8.GetBytes(message);
                 
-                channel.BasicPublish(exchange: "logs",
-                    routingKey: "",
+                channel.BasicPublish(exchange: "topic_logs",
+                    routingKey: severity,
                     basicProperties: null,
                     body: body);
 
-                Console.WriteLine($"[x] Send {message}");
+                Console.WriteLine($"[x] Send {severity} {message}");
             }
 
             Console.WriteLine("Press [enter] to exit.");

@@ -5,3 +5,4 @@ C:\src\rabbitMQ_TEST\Consumer\bin\Debug\RabbitMQ.Client.dll
 C:\src\rabbitMQ_TEST\Consumer\bin\Debug\RabbitMQ.Client.xml
 C:\src\rabbitMQ_TEST\Consumer\obj\Debug\Consumer.exe
 C:\src\rabbitMQ_TEST\Consumer\obj\Debug\Consumer.pdb
+C:\src\rabbitMQ_TEST\Consumer\obj\Debug\Consumer.csprojResolveAssemblyReference.cache

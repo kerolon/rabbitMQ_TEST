@@ -17,20 +17,33 @@ namespace Consumer
             using (var con = factory.CreateConnection())
             using (var channel = con.CreateModel())
             {
-                channel.ExchangeDeclare(exchange:"logs",type:"fanout");
+                channel.ExchangeDeclare(exchange:"topic_logs",type:"topic");
                 var queueName = channel.QueueDeclare().QueueName;
-                channel.QueueBind(queue: queueName, exchange: "logs", routingKey: "");
+
+                if(args.Length < 1)
+                {
+                    Console.Error.WriteLine($"Usage {Environment.GetCommandLineArgs()[0]} [binding_key]");
+                    Console.ReadLine();
+                    Environment.ExitCode = 1;
+                    return;
+                }
+
+                foreach(var bindingkey in args)
+                {
+                    channel.QueueBind(queue: queueName, exchange: "topic_logs", routingKey: bindingkey);
+                }
+
+                Console.WriteLine(" [*] Waiting for messaages.");                
                 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (model, ea) =>
                 {
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body);
-                    Console.WriteLine($"[x] {message}");
 
-                    int dots = message.Split('.').Length - 1;
-                    Thread.Sleep(dots * 1000);
-                    
+                    var routingKey = ea.RoutingKey;
+                    Console.WriteLine($"[x] Received {routingKey} {message}");
+                                        
                 };
 
                 channel.BasicConsume(
